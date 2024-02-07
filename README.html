@@ -687,45 +687,15 @@ with the MET data.</p>
 </ol>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">library</span>(dtplyr)</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code></pre></div>
-<pre><code>## 
-## Attaching package: &#39;dplyr&#39;
-
-## The following objects are masked from &#39;package:data.table&#39;:
-## 
-##     between, first, last
-
-## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     filter, lag
-
-## The following objects are masked from &#39;package:base&#39;:
-## 
-##     intersect, setdiff, setequal, union</code></pre>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">library</span>(mgcv)</span></code></pre></div>
-<pre><code>## Loading required package: nlme
-
-## 
-## Attaching package: &#39;nlme&#39;
-
-## The following object is masked from &#39;package:dplyr&#39;:
-## 
-##     collapse
-
-## This is mgcv 1.8-42. For overview type &#39;help(&quot;mgcv-package&quot;)&#39;.</code></pre>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">library</span>(leaflet)</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span></code></pre></div>
-<pre><code>## 
-## Attaching package: &#39;kableExtra&#39;
-
-## The following object is masked from &#39;package:dplyr&#39;:
-## 
-##     group_rows</code></pre>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>fn <span class="ot">&lt;-</span> <span class="st">&quot;https://raw.githubusercontent.com/JSC370/JSC370-2024/main/data/met_all_2023.gz&quot;</span></span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">file.exists</span>(<span class="st">&quot;met_all_2023.gz&quot;</span>))</span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="fu">download.file</span>(fn, <span class="at">destfile =</span> <span class="st">&quot;met_all_2023.gz&quot;</span>)</span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>met <span class="ot">&lt;-</span> data.table<span class="sc">::</span><span class="fu">fread</span>(<span class="st">&quot;met_all_2023.gz&quot;</span>)</span></code></pre></div>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="fu">library</span>(mgcv)</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="fu">library</span>(leaflet)</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>fn <span class="ot">&lt;-</span> <span class="st">&quot;https://raw.githubusercontent.com/JSC370/JSC370-2024/main/data/met_all_2023.gz&quot;</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">file.exists</span>(<span class="st">&quot;met_all_2023.gz&quot;</span>))</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="fu">download.file</span>(fn, <span class="at">destfile =</span> <span class="st">&quot;met_all_2023.gz&quot;</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>met <span class="ot">&lt;-</span> data.table<span class="sc">::</span><span class="fu">fread</span>(<span class="st">&quot;met_all_2023.gz&quot;</span>)</span></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
 <li>Load the met data from <a href="https://github.com/JSC370/JSC370-2024/main/data/met_all_2023.gz">https://github.com/JSC370/JSC370-2024/main/data/met_all_2023.gz</a>
 or (Use <a href="https://raw.githubusercontent.com/JSC370/JSC370-2024/main/data/met_all_2023.gz">https://raw.githubusercontent.com/JSC370/JSC370-2024/main/data/met_all_2023.gz</a>
@@ -733,40 +703,40 @@ to download programmatically), and also the station data. For the
 latter, you can use the code we used during lecture to pre-process the
 stations data:</li>
 </ol>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># Download the data</span></span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>stations <span class="ot">&lt;-</span> <span class="fu">fread</span>(<span class="st">&quot;ftp://ftp.ncdc.noaa.gov/pub/data/noaa/isd-history.csv&quot;</span>)</span>
-<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>stations[, USAF <span class="sc">:=</span> <span class="fu">as.integer</span>(USAF)]</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Download the data</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>stations <span class="ot">&lt;-</span> <span class="fu">fread</span>(<span class="st">&quot;ftp://ftp.ncdc.noaa.gov/pub/data/noaa/isd-history.csv&quot;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>stations[, USAF <span class="sc">:=</span> <span class="fu">as.integer</span>(USAF)]</span></code></pre></div>
 <pre><code>## Warning in eval(jsub, SDenv, parent.frame()): NAs introduced by coercion</code></pre>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># Dealing with NAs and 999999</span></span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>stations[, USAF   <span class="sc">:=</span> <span class="fu">fifelse</span>(USAF <span class="sc">==</span> <span class="dv">999999</span>, <span class="cn">NA_integer_</span>, USAF)]</span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>stations[, CTRY   <span class="sc">:=</span> <span class="fu">fifelse</span>(CTRY <span class="sc">==</span> <span class="st">&quot;&quot;</span>, <span class="cn">NA_character_</span>, CTRY)]</span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>stations[, STATE  <span class="sc">:=</span> <span class="fu">fifelse</span>(STATE <span class="sc">==</span> <span class="st">&quot;&quot;</span>, <span class="cn">NA_character_</span>, STATE)]</span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a></span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co"># Selecting the three relevant columns, and keeping unique records</span></span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>stations <span class="ot">&lt;-</span> <span class="fu">unique</span>(stations[, <span class="fu">list</span>(USAF, CTRY, STATE, LAT, LON)])</span>
-<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a></span>
-<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="co"># Dropping NAs</span></span>
-<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>stations <span class="ot">&lt;-</span> stations[<span class="sc">!</span><span class="fu">is.na</span>(USAF)]</span>
-<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a></span>
-<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a><span class="co"># Removing duplicates</span></span>
-<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a>stations[, n <span class="sc">:=</span> <span class="dv">1</span><span class="sc">:</span>.N, by <span class="ot">=</span> .(USAF)]</span>
-<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a>stations <span class="ot">&lt;-</span> stations[n <span class="sc">==</span> <span class="dv">1</span>,][, n <span class="sc">:=</span> <span class="cn">NULL</span>]</span>
-<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a></span>
-<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a><span class="co"># Read in the met data and fix lat, lon, temp</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Dealing with NAs and 999999</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>stations[, USAF   <span class="sc">:=</span> <span class="fu">fifelse</span>(USAF <span class="sc">==</span> <span class="dv">999999</span>, <span class="cn">NA_integer_</span>, USAF)]</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>stations[, CTRY   <span class="sc">:=</span> <span class="fu">fifelse</span>(CTRY <span class="sc">==</span> <span class="st">&quot;&quot;</span>, <span class="cn">NA_character_</span>, CTRY)]</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>stations[, STATE  <span class="sc">:=</span> <span class="fu">fifelse</span>(STATE <span class="sc">==</span> <span class="st">&quot;&quot;</span>, <span class="cn">NA_character_</span>, STATE)]</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co"># Selecting the three relevant columns, and keeping unique records</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>stations <span class="ot">&lt;-</span> <span class="fu">unique</span>(stations[, <span class="fu">list</span>(USAF, CTRY, STATE, LAT, LON)])</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co"># Dropping NAs</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>stations <span class="ot">&lt;-</span> stations[<span class="sc">!</span><span class="fu">is.na</span>(USAF)]</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co"># Removing duplicates</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>stations[, n <span class="sc">:=</span> <span class="dv">1</span><span class="sc">:</span>.N, by <span class="ot">=</span> .(USAF)]</span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>stations <span class="ot">&lt;-</span> stations[n <span class="sc">==</span> <span class="dv">1</span>,][, n <span class="sc">:=</span> <span class="cn">NULL</span>]</span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="co"># Read in the met data and fix lat, lon, temp</span></span></code></pre></div>
 <ol start="3" style="list-style-type: decimal">
 <li>Merge the data as we did during the lecture. Use the
 <code>merge()</code> code and you can also try the tidy way with
 <code>left_join()</code></li>
 </ol>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>met_dt <span class="ot">&lt;-</span> <span class="fu">merge</span>(</span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>  <span class="at">x =</span> met,</span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  <span class="at">y =</span> stations,</span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  <span class="at">by.x =</span> <span class="st">&quot;USAFID&quot;</span>,</span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>  <span class="at">by.y =</span> <span class="st">&quot;USAF&quot;</span>,</span>
-<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>  <span class="at">all.x =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a>  <span class="at">all.y =</span> <span class="cn">FALSE</span></span>
-<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a>)</span>
-<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="fu">head</span>(met_dt)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>met_dt <span class="ot">&lt;-</span> <span class="fu">merge</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="at">x =</span> met,</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="at">y =</span> stations,</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="at">by.x =</span> <span class="st">&quot;USAFID&quot;</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  <span class="at">by.y =</span> <span class="st">&quot;USAF&quot;</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="at">all.x =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>  <span class="at">all.y =</span> <span class="cn">FALSE</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>)</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="fu">head</span>(met_dt)</span></code></pre></div>
 <pre><code>##    USAFID  WBAN year month day hour min   lat     lon elev wind.dir wind.dir.qc
 ## 1: 690150 93121 2023     6   1   NA  56 34294 -116147  696      240           5
 ## 2: 690150 93121 2023     6   1    1  56 34294 -116147  696       NA           9
@@ -801,7 +771,81 @@ Identifying Representative Stations</h2>
 temperature, wind speed, and atmospheric pressure? Using the
 <code>quantile()</code> function, identify these three stations. Do they
 coincide?</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>med_met_dt <span class="ot">&lt;-</span> met_dt <span class="sc">|&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  <span class="fu">group_by</span>(USAFID) <span class="sc">|&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="fu">summarize_at</span>(<span class="fu">vars</span>(temp, wind.sp, atm.press), <span class="sc">~</span><span class="fu">quantile</span>(.x, <span class="fl">0.5</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="fu">head</span>(med_met_dt)</span></code></pre></div>
+<pre><code>## # A tibble: 6 × 4
+##   USAFID  temp wind.sp atm.press
+##    &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;
+## 1 690150  267       41     10094
+## 2 720110  280       31        NA
+## 3 720113  200       31        NA
+## 4 720120  240       36        NA
+## 5 720137  211       26        NA
+## 6 720151  280.      36        NA</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>med_temp <span class="ot">&lt;-</span> <span class="fu">quantile</span>(met_dt<span class="sc">$</span>temp, <span class="fl">0.5</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>med_wind_sp <span class="ot">&lt;-</span> <span class="fu">quantile</span>(met_dt<span class="sc">$</span>wind.sp, <span class="fl">0.5</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>med_atm_press <span class="ot">&lt;-</span> <span class="fu">quantile</span>(met_dt<span class="sc">$</span>atm.press, <span class="fl">0.5</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>Next identify the stations have these median values.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>med_temp_stat <span class="ot">&lt;-</span> med_met_dt <span class="sc">|&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>  <span class="fu">filter</span>(temp <span class="sc">==</span> med_temp)</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>med_wind_sp_stat <span class="ot">&lt;-</span> med_met_dt <span class="sc">|&gt;</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  <span class="fu">filter</span>(wind.sp <span class="sc">==</span> med_wind_sp)</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>med_atm_press_stat <span class="ot">&lt;-</span> med_met_dt <span class="sc">|&gt;</span></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>  <span class="fu">filter</span>(atm.press <span class="sc">==</span> med_atm_press)</span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="fu">head</span>(med_temp_stat)</span></code></pre></div>
+<pre><code>## # A tibble: 6 × 4
+##   USAFID  temp wind.sp atm.press
+##    &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;
+## 1 720263   217    26          NA
+## 2 720312   217    26          NA
+## 3 720327   217    46          NA
+## 4 722076   217    36          NA
+## 5 722180   217    31       10107
+## 6 722196   217    28.5     10106</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">head</span>(med_wind_sp_stat)</span></code></pre></div>
+<pre><code>## # A tibble: 6 × 4
+##   USAFID  temp wind.sp atm.press
+##    &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;
+## 1 720110   280      31        NA
+## 2 720113   200      31        NA
+## 3 720258   180      31        NA
+## 4 720261   277      31        NA
+## 5 720266   185      31        NA
+## 6 720267   200      31        NA</code></pre>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">head</span>(med_atm_press_stat)</span></code></pre></div>
+<pre><code>## # A tibble: 6 × 4
+##   USAFID  temp wind.sp atm.press
+##    &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;
+## 1 720394   239      21     10117
+## 2 722085   244      31     10117
+## 3 722348   244      21     10117
+## 4 723119   217      31     10117
+## 5 723124   211      26     10117
+## 6 723270   239      31     10117</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="fu">merge</span>(</span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>  <span class="at">x =</span> med_temp_stat,</span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>  <span class="at">y =</span> med_wind_sp_stat,</span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>  <span class="at">by.x =</span> <span class="st">&quot;USAFID&quot;</span>,</span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a>  <span class="at">by.y =</span> <span class="st">&quot;USAFID&quot;</span>,</span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a>  <span class="at">all.x =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a>  <span class="at">all.y =</span> <span class="cn">FALSE</span></span>
+<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a>) <span class="sc">|&gt;</span> <span class="fu">merge</span>(</span>
+<span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a>  <span class="at">y =</span> med_atm_press_stat,</span>
+<span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a>  <span class="at">by.x =</span> <span class="st">&quot;USAFID&quot;</span>,</span>
+<span id="cb19-11"><a href="#cb19-11" tabindex="-1"></a>  <span class="at">by.y =</span> <span class="st">&quot;USAFID&quot;</span>,</span>
+<span id="cb19-12"><a href="#cb19-12" tabindex="-1"></a>  <span class="at">all.x =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a>  <span class="at">all.y =</span> <span class="cn">FALSE</span></span>
+<span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a>)</span></code></pre></div>
+<pre><code>##   USAFID temp.x wind.sp.x atm.press.x temp.y wind.sp.y atm.press.y temp wind.sp
+## 1 723119    217        31       10117    217        31       10117  217      31
+##   atm.press
+## 1     10117</code></pre>
+<p><strong>Answer:</strong> From the above merges, the station with
+USAFID 723119 has median temperature, wind speed, and atmospheric
+pressure that match the national medians.</p>
 <p>Knit the document, commit your changes, and save it on GitHub. Don’t
 forget to add <code>README.md</code> to the tree, the first time you
 render it.</p>

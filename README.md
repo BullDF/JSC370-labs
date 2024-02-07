@@ -102,50 +102,11 @@ the MET data.
 library(data.table)
 library(dtplyr)
 library(dplyr)
-```
-
-    ## 
-    ## Attaching package: 'dplyr'
-
-    ## The following objects are masked from 'package:data.table':
-    ## 
-    ##     between, first, last
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     filter, lag
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     intersect, setdiff, setequal, union
-
-``` r
 library(mgcv)
-```
-
-    ## Loading required package: nlme
-
-    ## 
-    ## Attaching package: 'nlme'
-
-    ## The following object is masked from 'package:dplyr':
-    ## 
-    ##     collapse
-
-    ## This is mgcv 1.8-42. For overview type 'help("mgcv-package")'.
-
-``` r
 library(ggplot2)
 library(leaflet)
 library(kableExtra)
 ```
-
-    ## 
-    ## Attaching package: 'kableExtra'
-
-    ## The following object is masked from 'package:dplyr':
-    ## 
-    ##     group_rows
 
 ``` r
 fn <- "https://raw.githubusercontent.com/JSC370/JSC370-2024/main/data/met_all_2023.gz"
@@ -239,7 +200,105 @@ Across all weather stations, which stations have the median values of
 temperature, wind speed, and atmospheric pressure? Using the
 `quantile()` function, identify these three stations. Do they coincide?
 
+``` r
+med_met_dt <- met_dt |>
+  group_by(USAFID) |>
+  summarize_at(vars(temp, wind.sp, atm.press), ~quantile(.x, 0.5, na.rm = TRUE))
+head(med_met_dt)
+```
+
+    ## # A tibble: 6 × 4
+    ##   USAFID  temp wind.sp atm.press
+    ##    <int> <dbl>   <dbl>     <dbl>
+    ## 1 690150  267       41     10094
+    ## 2 720110  280       31        NA
+    ## 3 720113  200       31        NA
+    ## 4 720120  240       36        NA
+    ## 5 720137  211       26        NA
+    ## 6 720151  280.      36        NA
+
+``` r
+med_temp <- quantile(met_dt$temp, 0.5, na.rm = TRUE)
+med_wind_sp <- quantile(met_dt$wind.sp, 0.5, na.rm = TRUE)
+med_atm_press <- quantile(met_dt$atm.press, 0.5, na.rm = TRUE)
+```
+
 Next identify the stations have these median values.
+
+``` r
+med_temp_stat <- med_met_dt |>
+  filter(temp == med_temp)
+med_wind_sp_stat <- med_met_dt |>
+  filter(wind.sp == med_wind_sp)
+med_atm_press_stat <- med_met_dt |>
+  filter(atm.press == med_atm_press)
+
+head(med_temp_stat)
+```
+
+    ## # A tibble: 6 × 4
+    ##   USAFID  temp wind.sp atm.press
+    ##    <int> <dbl>   <dbl>     <dbl>
+    ## 1 720263   217    26          NA
+    ## 2 720312   217    26          NA
+    ## 3 720327   217    46          NA
+    ## 4 722076   217    36          NA
+    ## 5 722180   217    31       10107
+    ## 6 722196   217    28.5     10106
+
+``` r
+head(med_wind_sp_stat)
+```
+
+    ## # A tibble: 6 × 4
+    ##   USAFID  temp wind.sp atm.press
+    ##    <int> <dbl>   <dbl>     <dbl>
+    ## 1 720110   280      31        NA
+    ## 2 720113   200      31        NA
+    ## 3 720258   180      31        NA
+    ## 4 720261   277      31        NA
+    ## 5 720266   185      31        NA
+    ## 6 720267   200      31        NA
+
+``` r
+head(med_atm_press_stat)
+```
+
+    ## # A tibble: 6 × 4
+    ##   USAFID  temp wind.sp atm.press
+    ##    <int> <dbl>   <dbl>     <dbl>
+    ## 1 720394   239      21     10117
+    ## 2 722085   244      31     10117
+    ## 3 722348   244      21     10117
+    ## 4 723119   217      31     10117
+    ## 5 723124   211      26     10117
+    ## 6 723270   239      31     10117
+
+``` r
+merge(
+  x = med_temp_stat,
+  y = med_wind_sp_stat,
+  by.x = "USAFID",
+  by.y = "USAFID",
+  all.x = FALSE,
+  all.y = FALSE
+) |> merge(
+  y = med_atm_press_stat,
+  by.x = "USAFID",
+  by.y = "USAFID",
+  all.x = FALSE,
+  all.y = FALSE
+)
+```
+
+    ##   USAFID temp.x wind.sp.x atm.press.x temp.y wind.sp.y atm.press.y temp wind.sp
+    ## 1 723119    217        31       10117    217        31       10117  217      31
+    ##   atm.press
+    ## 1     10117
+
+**Answer:** From the above merges, the station with USAFID 723119 has
+median temperature, wind speed, and atmospheric pressure that match the
+national medians.
 
 Knit the document, commit your changes, and save it on GitHub. Don’t
 forget to add `README.md` to the tree, the first time you render it.

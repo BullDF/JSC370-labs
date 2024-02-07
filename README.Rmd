@@ -90,7 +90,7 @@ Once you are done setting up the project, you can now start working with the MET
 
 1. Load the `data.table` (and the `dtplyr` and `dplyr` packages), `mgcv`, `ggplot2`, `leaflet`, `kableExtra`.
 
-```{r packages, warnings=FALSE}
+```{r packages, warnings=FALSE, message=FALSE}
 library(data.table)
 library(dtplyr)
 library(dplyr)
@@ -152,14 +152,47 @@ head(met_dt)
 Across all weather stations, which stations have the median values of temperature, wind speed, and atmospheric pressure? Using the `quantile()` function, identify these three stations. Do they coincide?
 
 ```{r}
+med_met_dt <- met_dt |>
+  group_by(USAFID) |>
+  summarize_at(vars(temp, wind.sp, atm.press), ~quantile(.x, 0.5, na.rm = TRUE))
+head(med_met_dt)
 
+med_temp <- quantile(met_dt$temp, 0.5, na.rm = TRUE)
+med_wind_sp <- quantile(met_dt$wind.sp, 0.5, na.rm = TRUE)
+med_atm_press <- quantile(met_dt$atm.press, 0.5, na.rm = TRUE)
 ```
 
 Next identify the stations have these median values.
 
 ```{r}
+med_temp_stat <- med_met_dt |>
+  filter(temp == med_temp)
+med_wind_sp_stat <- med_met_dt |>
+  filter(wind.sp == med_wind_sp)
+med_atm_press_stat <- med_met_dt |>
+  filter(atm.press == med_atm_press)
 
+head(med_temp_stat)
+head(med_wind_sp_stat)
+head(med_atm_press_stat)
+
+merge(
+  x = med_temp_stat,
+  y = med_wind_sp_stat,
+  by.x = "USAFID",
+  by.y = "USAFID",
+  all.x = FALSE,
+  all.y = FALSE
+) |> merge(
+  y = med_atm_press_stat,
+  by.x = "USAFID",
+  by.y = "USAFID",
+  all.x = FALSE,
+  all.y = FALSE
+)
 ```
+
+**Answer:** From the above merges, the station with USAFID 723119 has median temperature, wind speed, and atmospheric pressure that match the national medians.
 
 Knit the document, commit your changes, and save it on GitHub. Don't forget to add `README.md` to the tree, the first time you render it.
 
