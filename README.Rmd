@@ -201,7 +201,46 @@ Knit the document, commit your changes, and save it on GitHub. Don't forget to a
 Now let's find the weather stations by state with closest temperature and wind speed based on the euclidean distance from these medians. 
 
 ```{r}
+state_meds <- met_dt |>
+  select(STATE, temp, wind.sp) |>
+  group_by(STATE) |>
+  summarize(
+    temp_state_med = median(temp, na.rm = TRUE),
+    wind_sp_state_med = median(wind.sp, na.rm = TRUE),
+  )
 
+met_with_meds <- merge(
+  x = met_dt,
+  y = state_meds,
+  by.x = "STATE",
+  by.y = "STATE",
+  all.x = TRUE,
+  all.y = FALSE
+) |>
+  select(STATE, USAFID, temp, wind.sp, temp_state_med, wind_sp_state_med)
+head(met_with_meds)
+
+stations_with_distances <- met_with_meds |>
+  group_by(USAFID, STATE, temp_state_med, wind_sp_state_med) |>
+  summarize(
+    temp = median(temp, na.rm = TRUE),
+    wind.sp = median(wind.sp, na.rm = TRUE),
+  ) |>
+  mutate(
+    dist = sqrt((temp - temp_state_med) ^ 2 + (wind.sp - wind_sp_state_med) ^ 2)
+  )
+
+stations_with_distances |>
+  group_by(STATE) |>
+  summarize(dist = min(dist, na.rm = TRUE)) |>
+  merge(
+    y = stations_with_distances,
+    by.x = c("STATE", "dist"),
+    by.y = c("STATE", "dist"),
+    all.x = TRUE,
+    all.y = FALSE
+  ) |>
+  select(STATE, USAFID, dist)
 ```
 
 Knit the doc and save it on GitHub.

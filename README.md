@@ -308,6 +308,171 @@ forget to add `README.md` to the tree, the first time you render it.
 Now let’s find the weather stations by state with closest temperature
 and wind speed based on the euclidean distance from these medians.
 
+``` r
+state_meds <- met_dt |>
+  select(STATE, temp, wind.sp) |>
+  group_by(STATE) |>
+  summarize(
+    temp_state_med = median(temp, na.rm = TRUE),
+    wind_sp_state_med = median(wind.sp, na.rm = TRUE),
+  )
+
+met_with_meds <- merge(
+  x = met_dt,
+  y = state_meds,
+  by.x = "STATE",
+  by.y = "STATE",
+  all.x = TRUE,
+  all.y = FALSE
+) |>
+  select(STATE, USAFID, temp, wind.sp, temp_state_med, wind_sp_state_med)
+head(met_with_meds)
+```
+
+    ##    STATE USAFID temp wind.sp temp_state_med wind_sp_state_med
+    ## 1:    AL 720265  247      15            233                26
+    ## 2:    AL 720265  240      NA            233                26
+    ## 3:    AL 720265  230      NA            233                26
+    ## 4:    AL 720265  226      NA            233                26
+    ## 5:    AL 720265  227      21            233                26
+    ## 6:    AL 720265  230      26            233                26
+
+``` r
+stations_with_distances <- met_with_meds |>
+  group_by(USAFID, STATE, temp_state_med, wind_sp_state_med) |>
+  summarize(
+    temp = median(temp, na.rm = TRUE),
+    wind.sp = median(wind.sp, na.rm = TRUE),
+  ) |>
+  mutate(
+    dist = sqrt((temp - temp_state_med) ^ 2 + (wind.sp - wind_sp_state_med) ^ 2)
+  )
+```
+
+    ## `summarise()` has grouped output by 'USAFID', 'STATE', 'temp_state_med'. You
+    ## can override using the `.groups` argument.
+
+``` r
+stations_with_distances |>
+  group_by(STATE) |>
+  summarize(dist = min(dist, na.rm = TRUE)) |>
+  merge(
+    y = stations_with_distances,
+    by.x = c("STATE", "dist"),
+    by.y = c("STATE", "dist"),
+    all.x = TRUE,
+    all.y = FALSE
+  ) |>
+  select(STATE, USAFID, dist)
+```
+
+    ##     STATE USAFID      dist
+    ## 1      AL 720265  2.000000
+    ## 2      AR 722188  1.000000
+    ## 3      AR 743312  1.000000
+    ## 4      AR 723405  1.000000
+    ## 5      AZ 722728  5.000000
+    ## 6      CA 722950  3.000000
+    ## 7      CO 724695  1.000000
+    ## 8      CT 725040  5.000000
+    ## 9      DE 724093  2.000000
+    ## 10     FL 722034  0.000000
+    ## 11     FL 722037  0.000000
+    ## 12     FL 722024  0.000000
+    ## 13     FL 747830  0.000000
+    ## 14     GA 747805  0.000000
+    ## 15     GA 720962  0.000000
+    ## 16     GA 720257  0.000000
+    ## 17     GA 722255  0.000000
+    ## 18     IA 725487  0.000000
+    ## 19     IA 725469  0.000000
+    ## 20     IA 722097  0.000000
+    ## 21     IA 720309  0.000000
+    ## 22     IA 725493  0.000000
+    ## 23     IA 725453  0.000000
+    ## 24     IA 725454  0.000000
+    ## 25     IA 725464  0.000000
+    ## 26     IA 725479  0.000000
+    ## 27     IA 720412  0.000000
+    ## 28     IA 725466  0.000000
+    ## 29     ID 725867  1.000000
+    ## 30     IL 744666  1.000000
+    ## 31     IL 725326  1.000000
+    ## 32     IN 744660  0.000000
+    ## 33     KS 724655  0.000000
+    ## 34     KY 724235  1.000000
+    ## 35     LA 722334  1.000000
+    ## 36     LA 720587  1.000000
+    ## 37     MA 725059  0.000000
+    ## 38     MD 725514  1.000000
+    ## 39     ME 726190  0.000000
+    ## 40     ME 727120  0.000000
+    ## 41     ME 726060  0.000000
+    ## 42     MI 726387  0.000000
+    ## 43     MI 725395  0.000000
+    ## 44     MN 726596  0.000000
+    ## 45     MN 720283  0.000000
+    ## 46     MN 722032  0.000000
+    ## 47     MN 722006  0.000000
+    ## 48     MN 726577  0.000000
+    ## 49     MN 726561  0.000000
+    ## 50     MO 724450  1.000000
+    ## 51     MO 723300  1.000000
+    ## 52     MS 722354  0.000000
+    ## 53     MT 726770  0.000000
+    ## 54     NC 722148  2.000000
+    ## 55     NC 722131  2.000000
+    ## 56     NC 720282  2.000000
+    ## 57     NC 723067  2.000000
+    ## 58     ND 720868  0.000000
+    ## 59     ND 720866  0.000000
+    ## 60     ND 727640  0.000000
+    ## 61     ND 720871  0.000000
+    ## 62     ND 720853  0.000000
+    ## 63     ND 720867  0.000000
+    ## 64     ND 720861  0.000000
+    ## 65     ND 727677  0.000000
+    ## 66     NE 725624  4.000000
+    ## 67     NE 725525  4.000000
+    ## 68     NH 726165  5.000000
+    ## 69     NJ 724075  0.000000
+    ## 70     NJ 720581  0.000000
+    ## 71     NJ 725025  0.000000
+    ## 72     NM 722683  5.830952
+    ## 73     NV 724885 16.763055
+    ## 74     NY 725190  0.000000
+    ## 75     OH 720414  1.000000
+    ## 76     OH 720713  1.000000
+    ## 77     OH 720651  1.000000
+    ## 78     OK 722164  2.000000
+    ## 79     OR 726830  6.000000
+    ## 80     OR 726886  6.000000
+    ## 81     OR 725976  6.000000
+    ## 82     PA 720324  2.692582
+    ## 83     RI 725079  5.830952
+    ## 84     RI 725054  5.830952
+    ## 85     SC 720613  0.000000
+    ## 86     SC 747918  0.000000
+    ## 87     SC 720602  0.000000
+    ## 88     SC 720611  0.000000
+    ## 89     SC 720633  0.000000
+    ## 90     SD 726518  5.000000
+    ## 91     TN 720974  0.000000
+    ## 92     TN 723249  0.000000
+    ## 93     TX 722448  0.000000
+    ## 94     TX 722523  0.000000
+    ## 95     TX 722533  0.000000
+    ## 96     UT 725750  7.810250
+    ## 97     UT 725724  7.810250
+    ## 98     VA 724036  3.000000
+    ## 99     VT 720493  3.000000
+    ## 100    WA 727924  0.000000
+    ## 101    WI 726415  0.000000
+    ## 102    WI 726457  0.000000
+    ## 103    WI 726509  0.000000
+    ## 104    WV 724177  5.000000
+    ## 105    WY 720521  0.000000
+
 Knit the doc and save it on GitHub.
 
 ## Question 3: In the Geographic Center?
