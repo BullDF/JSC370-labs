@@ -658,7 +658,7 @@ query:</p>
 <p>The parameters passed to the query are documented <a href="https://www.ncbi.nlm.nih.gov/books/NBK25499/">here</a>.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>query_ids <span class="ot">&lt;-</span> <span class="fu">GET</span>(</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">url   =</span> <span class="st">&quot;https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi&quot;</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">url =</span> <span class="st">&quot;https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi&quot;</span>,</span>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="at">query =</span> <span class="fu">list</span>(<span class="at">db =</span> <span class="st">&quot;pubmed&quot;</span>, <span class="at">term =</span> <span class="st">&quot;covid19 toronto&quot;</span>, <span class="at">retmax =</span> <span class="dv">300</span>)</span>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>)</span>
 <span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a></span>
@@ -681,10 +681,10 @@ lines of code:</p>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>ids <span class="ot">&lt;-</span> <span class="fu">as.character</span>(ids)</span>
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
 <span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co"># Find all the ids </span></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>ids <span class="ot">&lt;-</span> stringr<span class="sc">::</span><span class="fu">str_extract_all</span>(ids, <span class="st">&quot;PATTERN&quot;</span>)[[<span class="dv">1</span>]]</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>ids <span class="ot">&lt;-</span> stringr<span class="sc">::</span><span class="fu">str_extract_all</span>(ids, <span class="st">&quot;&lt;Id&gt;[0-9]+&lt;/Id&gt;&quot;</span>)[[<span class="dv">1</span>]]</span>
 <span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a></span>
 <span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co"># Remove all the leading and trailing &lt;Id&gt; &lt;/Id&gt;. Make use of &quot;|&quot;</span></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>ids <span class="ot">&lt;-</span> stringr<span class="sc">::</span><span class="fu">str_remove_all</span>(ids, <span class="st">&quot;PATTERN&quot;</span>)</span></code></pre></div>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>ids <span class="ot">&lt;-</span> stringr<span class="sc">::</span><span class="fu">str_remove_all</span>(ids, <span class="st">&quot;[&lt;Id&gt;|&lt;/Id&gt;]&quot;</span>)</span></code></pre></div>
 <p>With the ids in hand, we can now try to get the abstracts of the
 papers. As before, we will need to coerce the contents (results) to a
 list using:</p>
@@ -705,15 +705,18 @@ formula in R). For example, the text <code>&quot;123,456&quot;</code> is replace
 with <code>&quot;123%2C456&quot;</code>. If you don’t want that behavior, you
 would need to do the following <code>I(&quot;123,456&quot;)</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>publications <span class="ot">&lt;-</span> <span class="fu">GET</span>(</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="at">url   =</span> <span class="st">&quot;BASELINE URL HERE&quot;</span>,</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="at">url =</span> <span class="st">&quot;https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi&quot;</span>,</span>
 <span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="at">query =</span> <span class="fu">list</span>(</span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>    <span class="st">&quot;PARAMETERS OF THE QUERY&quot;</span></span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>    )</span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>)</span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a></span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co"># Turning the output into character vector</span></span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>publications <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">content</span>(publications)</span>
-<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>publications_txt <span class="ot">&lt;-</span> <span class="fu">as.character</span>(publications)</span></code></pre></div>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>    <span class="at">db =</span> <span class="st">&quot;pubmed&quot;</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>    <span class="at">id =</span> <span class="fu">I</span>(<span class="fu">paste</span>(ids, <span class="at">collapse =</span> <span class="st">&quot;,&quot;</span>)),</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>    <span class="at">retmax =</span> <span class="st">&quot;300&quot;</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>    <span class="at">rettype =</span> <span class="st">&quot;abstract&quot;</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>  )</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>)</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co"># Turning the output into character vector</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>publications <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">content</span>(publications)</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>publications_txt <span class="ot">&lt;-</span> <span class="fu">as.character</span>(publications)</span></code></pre></div>
 <p>With this in hand, we can now analyze the data. This is also a good
 time for committing and pushing your work!</p>
 <h2 id="question-4-distribution-of-universities-schools-and-departments">Question
