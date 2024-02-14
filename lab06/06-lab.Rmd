@@ -23,6 +23,12 @@ be using the `httr`, `xml2`, and `stringr` R packages.
 
 This markdown document should be rendered using `github_document` document ONLY and pushed to your _JSC370-labs_ repository in `lab06/README.md`.
 
+```{r}
+library(stringr)
+library(xml2)
+library(httr)
+```
+
 ## Question 1: How many sars-cov-2 papers?
 
 Build an automatic counter of sars-cov-2 papers using PubMed. You will need to apply XPath as we did during the lecture to extract the number of results returned by PubMed in the following web address:
@@ -142,11 +148,11 @@ Using the function `stringr::str_extract_all()` applied on `publications_txt`, c
 
 Write a regular expression that captures all such instances
 
-```{r univ-institute-regex, eval = FALSE}
+```{r univ-institute-regex}
 institution <- str_extract_all(
   publications_txt,
-  "[YOUR REGULAR EXPRESSION HERE]"
-  ) 
+  "(University of [:alpha:]+)|([:alpha:]+ Institute of [:alpha:]+)"
+)
 institution <- unlist(institution)
 as.data.frame(table(institution))
 ```
@@ -158,11 +164,11 @@ Repeat the exercise and this time focus on schools and departments in the form o
 
 And tabulate the results
 
-```{r school-department, eval = FALSE}
+```{r school-department}
 schools_and_deps <- str_extract_all(
-  abstracts_txt,
-  "[YOUR REGULAR EXPRESSION HERE]"
-  )
+  publications_txt,
+  "(School of [:alpha:]+)|(Department of [:alpha:])"
+)
 as.data.frame(table(schools_and_deps))
 ```
 

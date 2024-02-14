@@ -617,6 +617,9 @@ and <code>stringr</code> R packages.</p>
 <p>This markdown document should be rendered using
 <code>github_document</code> document ONLY and pushed to your
 <em>JSC370-labs</em> repository in <code>lab06/README.md</code>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(xml2)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(httr)</span></code></pre></div>
 <h2 id="question-1-how-many-sars-cov-2-papers">Question 1: How many
 sars-cov-2 papers?</h2>
 <p>Build an automatic counter of sars-cov-2 papers using PubMed. You
@@ -624,17 +627,17 @@ will need to apply XPath as we did during the lecture to extract the
 number of results returned by PubMed in the following web address:</p>
 <pre><code>https://pubmed.ncbi.nlm.nih.gov/?term=sars-cov-2</code></pre>
 <p>Complete the lines of code:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Downloading the website</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>website <span class="ot">&lt;-</span> xml2<span class="sc">::</span><span class="fu">read_html</span>(<span class="st">&quot;https://pubmed.ncbi.nlm.nih.gov/?term=sars-cov-2&quot;</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co"># Finding the counts</span></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>counts <span class="ot">&lt;-</span> xml2<span class="sc">::</span><span class="fu">xml_find_first</span>(website, <span class="st">&quot;/html/body/main/div[9]/div[2]/div[2]/div[1]/div[1]/h3/span&quot;</span>)</span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co"># Turning it into text</span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>counts <span class="ot">&lt;-</span> <span class="fu">as.character</span>(counts)</span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co"># Extracting the data using regex</span></span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>stringr<span class="sc">::</span><span class="fu">str_extract</span>(counts, <span class="st">&quot;[0-9|,]+&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Downloading the website</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>website <span class="ot">&lt;-</span> xml2<span class="sc">::</span><span class="fu">read_html</span>(<span class="st">&quot;https://pubmed.ncbi.nlm.nih.gov/?term=sars-cov-2&quot;</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co"># Finding the counts</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>counts <span class="ot">&lt;-</span> xml2<span class="sc">::</span><span class="fu">xml_find_first</span>(website, <span class="st">&quot;/html/body/main/div[9]/div[2]/div[2]/div[1]/div[1]/h3/span&quot;</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co"># Turning it into text</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>counts <span class="ot">&lt;-</span> <span class="fu">as.character</span>(counts)</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co"># Extracting the data using regex</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>stringr<span class="sc">::</span><span class="fu">str_extract</span>(counts, <span class="st">&quot;[0-9|,]+&quot;</span>)</span></code></pre></div>
 <pre><code>## [1] &quot;218,712&quot;</code></pre>
 <ul>
 <li>How many sars-cov-2 papers are there?</li>
@@ -656,14 +659,14 @@ query:</p>
 </ul></li>
 </ol>
 <p>The parameters passed to the query are documented <a href="https://www.ncbi.nlm.nih.gov/books/NBK25499/">here</a>.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>query_ids <span class="ot">&lt;-</span> <span class="fu">GET</span>(</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">url =</span> <span class="st">&quot;https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi&quot;</span>,</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="at">query =</span> <span class="fu">list</span>(<span class="at">db =</span> <span class="st">&quot;pubmed&quot;</span>, <span class="at">term =</span> <span class="st">&quot;covid19 toronto&quot;</span>, <span class="at">retmax =</span> <span class="dv">300</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>)</span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co"># Extracting the content of the response of GET</span></span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>ids <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">content</span>(query_ids)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>query_ids <span class="ot">&lt;-</span> <span class="fu">GET</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="at">url =</span> <span class="st">&quot;https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi&quot;</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="at">query =</span> <span class="fu">list</span>(<span class="at">db =</span> <span class="st">&quot;pubmed&quot;</span>, <span class="at">term =</span> <span class="st">&quot;covid19 toronto&quot;</span>, <span class="at">retmax =</span> <span class="dv">300</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>)</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co"># Extracting the content of the response of GET</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>ids <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">content</span>(query_ids)</span></code></pre></div>
 <p>The query will return an XML object, we can turn it into a character
 list to analyze the text directly with <code>as.character()</code>.
 Another way of processing the data could be using lists with the
@@ -677,14 +680,14 @@ details about the articles</h2>
 <code>&lt;Id&gt;... id number ...&lt;/Id&gt;</code>. we can use a
 regular expression that extract that information. Fill out the following
 lines of code:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Turn the result into a character vector</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>ids <span class="ot">&lt;-</span> <span class="fu">as.character</span>(ids)</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co"># Find all the ids </span></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>ids <span class="ot">&lt;-</span> stringr<span class="sc">::</span><span class="fu">str_extract_all</span>(ids, <span class="st">&quot;&lt;Id&gt;[0-9]+&lt;/Id&gt;&quot;</span>)[[<span class="dv">1</span>]]</span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co"># Remove all the leading and trailing &lt;Id&gt; &lt;/Id&gt;. Make use of &quot;|&quot;</span></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>ids <span class="ot">&lt;-</span> stringr<span class="sc">::</span><span class="fu">str_remove_all</span>(ids, <span class="st">&quot;[&lt;Id&gt;|&lt;/Id&gt;]&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Turn the result into a character vector</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>ids <span class="ot">&lt;-</span> <span class="fu">as.character</span>(ids)</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co"># Find all the ids </span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>ids <span class="ot">&lt;-</span> stringr<span class="sc">::</span><span class="fu">str_extract_all</span>(ids, <span class="st">&quot;&lt;Id&gt;[0-9]+&lt;/Id&gt;&quot;</span>)[[<span class="dv">1</span>]]</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co"># Remove all the leading and trailing &lt;Id&gt; &lt;/Id&gt;. Make use of &quot;|&quot;</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>ids <span class="ot">&lt;-</span> stringr<span class="sc">::</span><span class="fu">str_remove_all</span>(ids, <span class="st">&quot;[&lt;Id&gt;|&lt;/Id&gt;]&quot;</span>)</span></code></pre></div>
 <p>With the ids in hand, we can now try to get the abstracts of the
 papers. As before, we will need to coerce the contents (results) to a
 list using:</p>
@@ -704,19 +707,19 @@ element literal, wrap it around <code>I()</code> (as you would do in a
 formula in R). For example, the text <code>&quot;123,456&quot;</code> is replaced
 with <code>&quot;123%2C456&quot;</code>. If you don’t want that behavior, you
 would need to do the following <code>I(&quot;123,456&quot;)</code>.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>publications <span class="ot">&lt;-</span> <span class="fu">GET</span>(</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="at">url =</span> <span class="st">&quot;https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi&quot;</span>,</span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="at">query =</span> <span class="fu">list</span>(</span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>    <span class="at">db =</span> <span class="st">&quot;pubmed&quot;</span>,</span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>    <span class="at">id =</span> <span class="fu">I</span>(<span class="fu">paste</span>(ids, <span class="at">collapse =</span> <span class="st">&quot;,&quot;</span>)),</span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>    <span class="at">retmax =</span> <span class="st">&quot;300&quot;</span>,</span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>    <span class="at">rettype =</span> <span class="st">&quot;abstract&quot;</span></span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>  )</span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>)</span>
-<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a></span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co"># Turning the output into character vector</span></span>
-<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>publications <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">content</span>(publications)</span>
-<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>publications_txt <span class="ot">&lt;-</span> <span class="fu">as.character</span>(publications)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>publications <span class="ot">&lt;-</span> <span class="fu">GET</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="at">url =</span> <span class="st">&quot;https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi&quot;</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">query =</span> <span class="fu">list</span>(</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>    <span class="at">db =</span> <span class="st">&quot;pubmed&quot;</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>    <span class="at">id =</span> <span class="fu">I</span>(<span class="fu">paste</span>(ids, <span class="at">collapse =</span> <span class="st">&quot;,&quot;</span>)),</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>    <span class="at">retmax =</span> <span class="st">&quot;300&quot;</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>    <span class="at">rettype =</span> <span class="st">&quot;abstract&quot;</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>  )</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>)</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co"># Turning the output into character vector</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>publications <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">content</span>(publications)</span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>publications_txt <span class="ot">&lt;-</span> <span class="fu">as.character</span>(publications)</span></code></pre></div>
 <p>With this in hand, we can now analyze the data. This is also a good
 time for committing and pushing your work!</p>
 <h2 id="question-4-distribution-of-universities-schools-and-departments">Question
@@ -728,12 +731,181 @@ time for committing and pushing your work!</p>
 <li>… Institute of …</li>
 </ol>
 <p>Write a regular expression that captures all such instances</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>institution <span class="ot">&lt;-</span> <span class="fu">str_extract_all</span>(</span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  publications_txt,</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="st">&quot;[YOUR REGULAR EXPRESSION HERE]&quot;</span></span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  ) </span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>institution <span class="ot">&lt;-</span> <span class="fu">unlist</span>(institution)</span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="fu">as.data.frame</span>(<span class="fu">table</span>(institution))</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>institution <span class="ot">&lt;-</span> <span class="fu">str_extract_all</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  publications_txt,</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="st">&quot;(University of [:alpha:]+)|([:alpha:]+ Institute of [:alpha:]+)&quot;</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>)</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>institution <span class="ot">&lt;-</span> <span class="fu">unlist</span>(institution)</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="fu">as.data.frame</span>(<span class="fu">table</span>(institution))</span></code></pre></div>
+<pre><code>##                               institution Freq
+## 1                 and Institute of Health    1
+## 2             Caledon Institute of Social    1
+## 3      California Institute of Technology    2
+## 4            Canadian Institute of Health    3
+## 5           Catalan Institute of Oncology    1
+## 6          Chinese Institute of Engineers    1
+## 7              CIHR Institute of Genetics    1
+## 8                CIHR Institute of Health    1
+## 9       College Institute of Neuroscience    1
+## 10           Gordon Institute of Business    1
+## 11      Graduate Institute of Acupuncture    1
+## 12         Heidelberg Institute of Global    2
+## 13                In Institute of Network    1
+## 14             India Institute of Medical    1
+## 15                 IZA Institute of Labor    1
+## 16              Knowledge Institute of St    1
+## 17              Leeds Institute of Health    1
+## 18  Massachusetts Institute of Technology    3
+## 19             Meghe Institute of Medical    1
+## 20        National Institute of Arthritis    1
+## 21         National Institute of Diabetes    1
+## 22           National Institute of Health    1
+## 23           National Institute of Mental    1
+## 24     National Institute of Neurological    1
+## 25          National Institute of Science    1
+## 26      Postgraduate Institute of Medical    1
+## 27         Research Institute of Genetics    1
+## 28         Research Institute of Manitoba    1
+## 29               Research Institute of St    3
+## 30              Research Institute of the    5
+## 31          Saveetha Institute of Medical    1
+## 32            Sinai Institute of Critical    1
+## 33                the Institute of Health    1
+## 34                 University of Aberdeen    1
+## 35                 University of Adelaide    1
+## 36                  University of alberta    1
+## 37                  University of Alberta   64
+## 38                University of Amsterdam    2
+## 39                University of Antioquia    1
+## 40                  University of Applied    1
+## 41                  University of Arizona    4
+## 42                 University of Auckland    7
+## 43                University of Barcelona    2
+## 44                     University of Bari    5
+## 45                    University of Basel    2
+## 46                   University of Beirut    1
+## 47                 University of Belgrade    3
+## 48                   University of Bergen    1
+## 49                   University of Berlin    2
+## 50                     University of Bern    2
+## 51               University of Birmingham    3
+## 52                     University of Bonn    1
+## 53                  University of Brescia   18
+## 54                  University of Bristol    1
+## 55                  University of British  115
+## 56                  University of Calgary   54
+## 57               University of California   12
+## 58                University of Cambridge    5
+## 59                 University of Campinas    1
+## 60                     University of Cape    1
+## 61                University of Cartagena    1
+## 62                  University of Chicago    3
+## 63                  University of Cologne    4
+## 64                 University of Colorado    1
+## 65              University of Connecticut    7
+## 66               University of Copenhagen    1
+## 67                     University of Doha    3
+## 68                  University of Eastern    2
+## 69                   University of Exeter    1
+## 70                  University of Florida    1
+## 71                   University of Foggia    2
+## 72                   University of Gdansk    1
+## 73                   University of Geneva    2
+## 74                  University of Granada    3
+## 75                University of Groningen    1
+## 76                   University of Guelph    9
+## 77                    University of Halle    1
+## 78                   University of Hawaii    1
+## 79                   University of Health    1
+## 80                 University of Helsinki    2
+## 81            University of Hertfordshire    1
+## 82                     University of Hong   16
+## 83                 University of Illinois    6
+## 84                   University of Kansas    4
+## 85                     University of Kent    2
+## 86                  University of Koblenz    2
+## 87                     University of Kyiv    2
+## 88                        University of L    1
+## 89                    University of Leeds    2
+## 90                University of Ljubljana    1
+## 91                   University of London    1
+## 92                 University of Manitoba   21
+## 93                 University of Mannheim    1
+## 94                 University of Maryland    1
+## 95                  University of Mashhad    2
+## 96                  University of Medical   22
+## 97                 University of Medicine    2
+## 98                University of Melbourne    4
+## 99                  University of Messina    2
+## 100                  University of Mexico    1
+## 101                University of Michigan    7
+## 102                   University of Milan    1
+## 103                  University of Milano    5
+## 104                 University of Mineiro    1
+## 105                  University of Modena    1
+## 106             University of Montpellier    1
+## 107                University of Montreal    3
+## 108                University of Montréal    4
+## 109                 University of Navarra    1
+## 110                   University of Negev    1
+## 111                     University of New    3
+## 112               University of Newcastle    1
+## 113            University of Newfoundland    2
+## 114                 University of Nigeria    1
+## 115                   University of North    4
+## 116                University of Northern    1
+## 117                  University of Norway    1
+## 118                   University of Notre    1
+## 119              University of Nottingham    2
+## 120                 University of Ontario    1
+## 121                  University of Oregon    2
+## 122                    University of Oslo    1
+## 123                  University of Ottawa   61
+## 124                  University of Oxford   11
+## 125                   University of Padua    1
+## 126                 University of Paraiba   13
+## 127                 University of Pelotas    3
+## 128            University of Pennsylvania    7
+## 129              University of Pittsburgh   19
+## 130                University of Plymouth    1
+## 131                University of Pretoria    1
+## 132                  University of Public    1
+## 133                  University of Punjab    1
+## 134              University of Queensland    6
+## 135                  University of Regina    2
+## 136                     University of Rio    2
+## 137               University of Rochester    1
+## 138                    University of Rome    7
+## 139                     University of São    1
+## 140            University of Saskatchewan    3
+## 141                 University of Seville    4
+## 142              University of Sherbrooke    1
+## 143               University of Singapore    5
+## 144                   University of South    1
+## 145                University of Southern    7
+## 146                  University of Sydney   46
+## 147                  University of Tehran    1
+## 148                   University of Texas    3
+## 149                     University of the    2
+## 150               University of Timisoara    3
+## 151                 University of Toronto  848
+## 152                  University of Trento    1
+## 153                    University of Utah    4
+## 154                 University of Vermont    2
+## 155                University of Victoria   14
+## 156                  University of Vienna    3
+## 157                University of Virginia    1
+## 158                 University of Waikato    1
+## 159                  University of Warsaw    2
+## 160              University of Washington    7
+## 161                University of Waterloo   16
+## 162                 University of Western   16
+## 163                 University of Windsor    1
+## 164               University of Wisconsin    1
+## 165           University of Witwatersrand    1
+## 166               University of Wuppertal    2
+## 167                    University of York    2
+## 168                  University of Zurich    4</code></pre>
 <p>Repeat the exercise and this time focus on schools and departments in
 the form of</p>
 <ol style="list-style-type: decimal">
@@ -741,11 +913,69 @@ the form of</p>
 <li>Department of …</li>
 </ol>
 <p>And tabulate the results</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>schools_and_deps <span class="ot">&lt;-</span> <span class="fu">str_extract_all</span>(</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  abstracts_txt,</span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="st">&quot;[YOUR REGULAR EXPRESSION HERE]&quot;</span></span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  )</span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="fu">as.data.frame</span>(<span class="fu">table</span>(schools_and_deps))</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>schools_and_deps <span class="ot">&lt;-</span> <span class="fu">str_extract_all</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  publications_txt,</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="st">&quot;(School of [:alpha:]+)|(Department of [:alpha:])&quot;</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>)</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="fu">as.data.frame</span>(<span class="fu">table</span>(schools_and_deps))</span></code></pre></div>
+<pre><code>##            schools_and_deps Freq
+## 1           Department of A   43
+## 2           Department of B   38
+## 3           Department of C   95
+## 4           Department of D   31
+## 5           Department of E   89
+## 6           Department of F  115
+## 7           Department of G   14
+## 8           Department of H   82
+## 9           Department of I   55
+## 10          Department of J    1
+## 11          Department of K    3
+## 12          Department of L   10
+## 13          Department of M  239
+## 14          Department of N   62
+## 15          Department of O   54
+## 16          Department of P  498
+## 17          Department of R   34
+## 18          Department of S   50
+## 19          Department of T    2
+## 20          Department of V    2
+## 21         School of Allied   12
+## 22          School of Basic   10
+## 23     School of Biomedical    1
+## 24       School of Business    5
+## 25         School of Cancer    2
+## 26       School of Clinical   10
+## 27      School of Community    1
+## 28           School of Data    1
+## 29      School of Dentistry    6
+## 30      School of Economics    9
+## 31    School of Educational    2
+## 32    School of Engineering    5
+## 33   School of Epidemiology   11
+## 34      School of Geography    2
+## 35         School of Global    6
+## 36         School of Health   21
+## 37        School of Hygiene    8
+## 38  School of International    1
+## 39     School of Journalism    1
+## 40    School of Kinesiology    4
+## 41           School of Life   11
+## 42     School of Management    6
+## 43        School of Medical    1
+## 44       School of Medicine  161
+## 45        School of Nursing   17
+## 46   School of Occupational    8
+## 47       School of Pharmacy    1
+## 48       School of Physical    5
+## 49  School of Physiotherapy    1
+## 50     School of Population   24
+## 51        School of Primary    2
+## 52     School of Psychiatry    1
+## 53     School of Psychology    5
+## 54         School of Public  175
+## 55 School of Rehabilitation   14
+## 56         School of Social    8
+## 57            School of the    2</code></pre>
 <h2 id="question-5-form-a-database">Question 5: Form a database</h2>
 <p>We want to build a dataset which includes the title and the abstract
 of the paper. The title of all records is enclosed by the HTML tag
@@ -757,23 +987,23 @@ to process the XML a bit. We will use the
 This way, if a paper is missing the abstract, or something else, we will
 be able to properly match PUBMED IDS with their corresponding
 records.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>pub_char_list <span class="ot">&lt;-</span> xml2<span class="sc">::</span><span class="fu">xml_children</span>(publications)</span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>pub_char_list <span class="ot">&lt;-</span> <span class="fu">sapply</span>(pub_char_list, as.character)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>pub_char_list <span class="ot">&lt;-</span> xml2<span class="sc">::</span><span class="fu">xml_children</span>(publications)</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>pub_char_list <span class="ot">&lt;-</span> <span class="fu">sapply</span>(pub_char_list, as.character)</span></code></pre></div>
 <p>Now, extract the abstract and article title for each one of the
 elements of <code>pub_char_list</code>. You can either use
 <code>sapply()</code> as we just did, or simply take advantage of
 vectorization of <code>stringr::str_extract</code></p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>abstracts <span class="ot">&lt;-</span> <span class="fu">str_extract</span>(pub_char_list, <span class="st">&quot;[YOUR REGULAR EXPRESSION]&quot;</span>)</span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>abstracts <span class="ot">&lt;-</span> <span class="fu">str_remove_all</span>(abstracts, <span class="st">&quot;[CLEAN ALL THE HTML TAGS]&quot;</span>)</span>
-<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>abstracts <span class="ot">&lt;-</span> <span class="fu">str_remove_all</span>(abstracts, <span class="st">&quot;[CLEAN ALL EXTRA WHITE SPACE AND NEW LINES]&quot;</span>)</span>
-<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co"># alternatively, you can also use str_replace_all(abstracts, &quot;[ORIGINAL]&quot;, &quot;[REPLACEMENT]&quot;)</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>abstracts <span class="ot">&lt;-</span> <span class="fu">str_extract</span>(pub_char_list, <span class="st">&quot;[YOUR REGULAR EXPRESSION]&quot;</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>abstracts <span class="ot">&lt;-</span> <span class="fu">str_remove_all</span>(abstracts, <span class="st">&quot;[CLEAN ALL THE HTML TAGS]&quot;</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>abstracts <span class="ot">&lt;-</span> <span class="fu">str_remove_all</span>(abstracts, <span class="st">&quot;[CLEAN ALL EXTRA WHITE SPACE AND NEW LINES]&quot;</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co"># alternatively, you can also use str_replace_all(abstracts, &quot;[ORIGINAL]&quot;, &quot;[REPLACEMENT]&quot;)</span></span></code></pre></div>
 <ul>
 <li>How many of these don’t have an abstract?</li>
 </ul>
 <p><em>Answer here.</em></p>
 <p>Now, the title</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>titles <span class="ot">&lt;-</span> <span class="fu">str_extract</span>(pub_char_list, <span class="st">&quot;[YOUR REGULAR EXPRESSION]&quot;</span>)</span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>titles <span class="ot">&lt;-</span> <span class="fu">str_remove_all</span>(titles, <span class="st">&quot;[CLEAN ALL THE HTML TAGS]&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>titles <span class="ot">&lt;-</span> <span class="fu">str_extract</span>(pub_char_list, <span class="st">&quot;[YOUR REGULAR EXPRESSION]&quot;</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>titles <span class="ot">&lt;-</span> <span class="fu">str_remove_all</span>(titles, <span class="st">&quot;[CLEAN ALL THE HTML TAGS]&quot;</span>)</span></code></pre></div>
 <ul>
 <li>How many of these don’t have a title ?</li>
 </ul>
@@ -781,21 +1011,21 @@ vectorization of <code>stringr::str_extract</code></p>
 <p>Finally, put everything together into a single
 <code>data.frame</code> and use <code>knitr::kable</code> to print the
 results</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>database <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>  <span class="st">&quot;[DATA TO CONCATENATE]&quot;</span></span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>)</span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(database)</span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a></span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co"># The table will likely be huge. How can we make the output look better?</span></span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co"># (one idea: kableExtra::scroll_box())</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>database <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>  <span class="st">&quot;[DATA TO CONCATENATE]&quot;</span></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>)</span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(database)</span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="co"># The table will likely be huge. How can we make the output look better?</span></span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a><span class="co"># (one idea: kableExtra::scroll_box())</span></span></code></pre></div>
 <p>Done! Knit the document, commit, and push.</p>
 <h2 id="final-pro-tip-optional">Final Pro Tip (optional)</h2>
 <p>You can still share the HTML document on github. You can include a
 link in your <code>README.md</code> file as the following:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode md"><code class="sourceCode markdown"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>View <span class="co">[</span><span class="ot">here</span><span class="co">](https://cdn.jsdelivr.net/gh/:user/:repo@:tag/:file)</span> </span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode md"><code class="sourceCode markdown"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>View <span class="co">[</span><span class="ot">here</span><span class="co">](https://cdn.jsdelivr.net/gh/:user/:repo@:tag/:file)</span> </span></code></pre></div>
 <p>For example, if we wanted to add a direct link the HTML page of
 lecture 6, we could do something like the following:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode md"><code class="sourceCode markdown"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>View Week 6 Lecture <span class="co">[</span><span class="ot">here</span><span class="co">]()</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode md"><code class="sourceCode markdown"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>View Week 6 Lecture <span class="co">[</span><span class="ot">here</span><span class="co">]()</span></span></code></pre></div>
 
 </body>
 </html>
