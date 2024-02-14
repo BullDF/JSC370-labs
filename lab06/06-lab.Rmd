@@ -167,7 +167,7 @@ And tabulate the results
 ```{r school-department}
 schools_and_deps <- str_extract_all(
   publications_txt,
-  "(School of [:alpha:]+)|(Department of [:alpha:])"
+  "(School of [:alpha:]+)|(Department of [:alpha:]+)"
 )
 as.data.frame(table(schools_and_deps))
 ```
