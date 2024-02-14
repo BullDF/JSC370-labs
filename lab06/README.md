@@ -70,8 +70,8 @@ The parameters passed to the query are documented
 ``` r
 library(httr)
 query_ids <- GET(
-  url   = "BASELINE URL",
-  query = list("QUERY PARAMETERS")
+  url   = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi",
+  query = list(db = "pubmed", term = "covid19 toronto", retmax = 300)
 )
 
 # Extracting the content of the response of GET
