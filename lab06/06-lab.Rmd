@@ -1,11 +1,10 @@
 ---
 title: "Lab 06 - Regular Expressions and Web Scraping"
-output: 
-  github_document: default
+output: html_document
 ---
 
 ```{r setup, echo=FALSE}
-knitr::opts_chunk$set(include  = TRUE)
+knitr::opts_chunk$set(include = TRUE)
 ```
 
 
@@ -17,16 +16,20 @@ knitr::opts_chunk$set(include  = TRUE)
 
 # Lab description
 
-In this lab, we will be working with the [NCBI API](https://www.ncbi.nlm.nih.gov/home/develop/api/)
-to make queries and extract information using XML and regular expressions. For this lab, we will
-be using the `httr`, `xml2`, and `stringr` R packages.
+In this lab, we will be working with the [NCBI API](https://www.ncbi.nlm.nih.gov/home/develop/api/) to make queries and extract information using XML and regular expressions. For this lab, we will be using the `httr`, `xml2`, and `stringr` R packages.
 
 This markdown document should be rendered using `github_document` document ONLY and pushed to your _JSC370-labs_ repository in `lab06/README.md`.
 
-```{r}
+```{r message=FALSE}
 library(stringr)
 library(xml2)
 library(httr)
+library(kableExtra)
+library(styler)
+```
+
+```{r eval=FALSE, echo=FALSE}
+style_file("06-lab.Rmd")
 ```
 
 ## Question 1: How many sars-cov-2 papers?
@@ -44,7 +47,10 @@ Complete the lines of code:
 website <- xml2::read_html("https://pubmed.ncbi.nlm.nih.gov/?term=sars-cov-2")
 
 # Finding the counts
-counts <- xml2::xml_find_first(website, "/html/body/main/div[9]/div[2]/div[2]/div[1]/div[1]/h3/span")
+counts <- xml_find_first(
+  website,
+  "/html/body/main/div[9]/div[2]/div[2]/div[1]/div[1]/h3/span"
+)
 
 # Turning it into text
 counts <- as.character(counts)
@@ -84,32 +90,26 @@ query_ids <- GET(
 ids <- httr::content(query_ids)
 ```
 
-The query will return an XML object, we can turn it into a character list to
-analyze the text directly with `as.character()`. Another way of processing the
-data could be using lists with the function `xml2::as_list()`. We will skip the latter for now.
+The query will return an XML object, we can turn it into a character list to analyze the text directly with `as.character()`. Another way of processing the data could be using lists with the function `xml2::as_list()`. We will skip the latter for now.
 
-Take a look at the data, and continue with the next question (don't forget to 
-commit and push your results to your GitHub repo!).
+Take a look at the data, and continue with the next question (don't forget to  commit and push your results to your GitHub repo!).
 
 ## Question 3: Get details about the articles
 
-The Ids are wrapped around text in the following way: `<Id>... id number ...</Id>`.
-we can use a regular expression that extract that information. Fill out the
-following lines of code:
+The Ids are wrapped around text in the following way: `<Id>... id number ...</Id>`. We can use a regular expression that extract that information. Fill out the following lines of code:
 
 ```{r get-ids}
 # Turn the result into a character vector
 ids <- as.character(ids)
 
-# Find all the ids 
+# Find all the ids
 ids <- stringr::str_extract_all(ids, "<Id>[0-9]+</Id>")[[1]]
 
 # Remove all the leading and trailing <Id> </Id>. Make use of "|"
 ids <- stringr::str_remove_all(ids, "[<Id>|</Id>]")
 ```
 
-With the ids in hand, we can now try to get the abstracts of the papers. As
-before, we will need to coerce the contents (results) to a list using:
+With the ids in hand, we can now try to get the abstracts of the papers. As before, we will need to coerce the contents (results) to a list using:
 
 1. Baseline url: https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi
 
@@ -178,53 +178,55 @@ We want to build a dataset which includes the title and the abstract of the
 paper. The title of all records is enclosed by the HTML tag `ArticleTitle`, and
 the abstract by `AbstractText`. 
 
-Before applying the functions to extract text directly, it will help to process
-the XML a bit. We will use the `xml2::xml_children()` function to keep one element
-per id. This way, if a paper is missing the abstract, or something else, we will be able to properly match PUBMED IDS with their corresponding records.
+Before applying the functions to extract text directly, it will help to process the XML a bit. We will use the `xml2::xml_children()` function to keep one element per id. This way, if a paper is missing the abstract, or something else, we will be able to properly match PUBMED IDS with their corresponding records.
 
 
-```{r one-string-per-response, eval = FALSE}
+```{r one-string-per-response}
 pub_char_list <- xml2::xml_children(publications)
 pub_char_list <- sapply(pub_char_list, as.character)
 ```
 
-Now, extract the abstract and article title for each one of the elements of
-`pub_char_list`. You can either use `sapply()` as we just did, or simply
-take advantage of vectorization of `stringr::str_extract`
+Now, extract the abstract and article title for each one of the elements of `pub_char_list`. You can either use `sapply()` as we just did, or simply take advantage of vectorization of `stringr::str_extract`
 
-```{r extracting-last-bit, eval = FALSE}
-abstracts <- str_extract(pub_char_list, "[YOUR REGULAR EXPRESSION]")
-abstracts <- str_remove_all(abstracts, "[CLEAN ALL THE HTML TAGS]")
-abstracts <- str_remove_all(abstracts, "[CLEAN ALL EXTRA WHITE SPACE AND NEW LINES]")
-# alternatively, you can also use str_replace_all(abstracts, "[ORIGINAL]", "[REPLACEMENT]")
+```{r extracting-last-bit}
+abstracts <- str_extract(pub_char_list, "<Abstract>(.|\\n)+?</Abstract>")
+abstracts <- str_remove_all(abstracts, "<CopyrightInformation>(.|\\n)+|<[^>]+>")
+abstracts <- str_replace_all(abstracts, "[\\s]+", " ")
+abstracts <- str_remove_all(abstracts, "^ ")
+abstracts <- str_remove_all(abstracts, " $")
+abstracts_na <- which(is.na(abstracts)) |> length()
+abstracts_na
 ```
 
   - How many of these don't have an abstract? 
 
-_Answer here._
+_Answer here._ `r abstracts_na` of them don't have an abstract.
 
 Now, the title
 
-```{r process-titles, eval = FALSE}
-titles <- str_extract(pub_char_list, "[YOUR REGULAR EXPRESSION]")
-titles <- str_remove_all(titles, "[CLEAN ALL THE HTML TAGS]")
+```{r process-titles}
+titles <- str_extract(pub_char_list, "<ArticleTitle>(.|\\n)+?</ArticleTitle>")
+titles <- str_remove_all(titles, "(<ArticleTitle>)|(</ArticleTitle>)")
+title_na <- which(is.na(titles)) |> length()
+title_na
 ```
 
-- How many of these don't have a title ? 
+- How many of these don't have a title ?
 
-_Answer here._
+_Answer here._ `r title_na` of them don't have a title.
 
 Finally, put everything together into a single `data.frame` and use
 `knitr::kable` to print the results
 
-```{r build-db, eval = FALSE}
+```{r build-db}
 database <- data.frame(
-  "[DATA TO CONCATENATE]"
+  titles, abstracts
 )
-knitr::kable(database)
 
-# The table will likely be huge. How can we make the output look better?
-# (one idea: kableExtra::scroll_box())
+database |>
+  kbl() |>
+  kable_styling() |>
+  scroll_box(height = "500px")
 ```
 
 Done! Knit the document, commit, and push.
