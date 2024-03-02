@@ -4,7 +4,7 @@ output: html_document
 ---
 
 ```{r setup, echo=FALSE}
-knitr::opts_chunk$set(eval = FALSE, include = TRUE)
+knitr::opts_chunk$set(include = TRUE, message = FALSE, warning = FALSE)
 ```
 
 # Learning goals
@@ -81,8 +81,9 @@ tokens <- mt_samples |>
   head(20)
 
 tokens |>
-  ggplot(aes(fct_reorder(word, -word_frequency), word_frequency)) +
-  geom_bar(stat = "identity")
+  ggplot(aes(fct_reorder(word, word_frequency), word_frequency)) +
+  geom_bar(stat = "identity") +
+  coord_flip()
 
 wordcloud(words = tokens$word, freq = tokens$word_frequency)
 ```
@@ -113,8 +114,9 @@ tokens <- mt_samples |>
   head(20)
 
 tokens |>
-  ggplot(aes(fct_reorder(word, -word_frequency), word_frequency)) +
-  geom_bar(stat = "identity")
+  ggplot(aes(fct_reorder(word, word_frequency), word_frequency)) +
+  geom_bar(stat = "identity") +
+  coord_flip()
 
 wordcloud(words = tokens$word, freq = tokens$word_frequency)
 
@@ -150,7 +152,10 @@ tokens_bigram |>
   geom_bar(stat = "identity") +
   coord_flip()
 
-wordcloud(words = tokens_bigram$ngram, freq = tokens_bigram$ngram_frequency)
+wordcloud(
+  words = head(tokens_bigram, 20)$ngram,
+  freq = head(tokens_bigram, 20)$ngram_frequency
+)
 ```
 ---
 
@@ -172,8 +177,9 @@ tokens_bigram |>
   summarize(word_frequency = sum(ngram_frequency)) |>
   arrange(desc(word_frequency)) |>
   head(20) |>
-  ggplot(aes(fct_reorder(word, -word_frequency), word_frequency)) +
-  geom_bar(stat = "identity")
+  ggplot(aes(fct_reorder(word, word_frequency), word_frequency)) +
+  geom_bar(stat = "identity") +
+  coord_flip()
 ```
 
 ---
@@ -193,7 +199,8 @@ mt_samples |>
   summarize(word_frequency = n()) |>
   top_n(1) |>
   kbl() |>
-  kable_styling()
+  kable_styling() |>
+  scroll_box(height = "500px")
 
 mt_samples |>
   unnest_tokens(word, transcription) |>
@@ -203,7 +210,8 @@ mt_samples |>
   summarize(word_frequency = n()) |>
   top_n(5) |>
   kbl() |>
-  kable_styling()
+  kable_styling() |>
+  scroll_box(height = "500px")
 ```
 
 
