@@ -4,7 +4,7 @@ output: html_document
 ---
 
 ```{r setup, echo=FALSE}
-knitr::opts_chunk$set(eval = FALSE, include = FALSE)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ```
 
 # Learning Goals
@@ -190,29 +190,21 @@ sb_nutr |>
 
 - Create a boxplot of all of the nutritional variables in groups by the 10 item words.
 
-```{r}
+```{r fig.width=10}
 filtered_data <- sb_nutr |>
   unnest_tokens(word, Item) |>
   filter(word %in% topwords$word)
 filtered_data |>
-  plot_ly(x = ~word, type = "box") |>
-  add_boxplot(
-    y = ~Calories,
-    name = "Calories"
+  plot_ly(x = ~word, y = ~Calories, type = "box", name = "Calories") |>
+  add_boxplot(y = ~`Fat (g)`, name = "Fat"
   ) |>
-  add_boxplot(
-    y = ~`Fat (g)`,
-    name = "Fat"
-  ) 
-  
-  
-  |>
-  add_boxplot(y = ~`Carb. (g)`) |>
-  add_boxplot(y = ~`Fiber (g)`) |>
-  add_boxplot(y = ~`Protein (g)`) |>
+  add_boxplot(y = ~`Carb. (g)`, name = "Carbohydrates") |>
+  add_boxplot(y = ~`Fiber (g)`, name = "Fiber") |>
+  add_boxplot(y = ~`Protein (g)`, name = "Protein") |>
   layout(
     xaxis = list(title = "Item"),
-    yaxis = list(title = "Nutritional Variables")
+    yaxis = list(title = "Nutritional Variables"),
+    boxmode = "group"
   )
 ```
 
@@ -249,7 +241,7 @@ set_map_details <- list(
 )
 
 # Make sure both maps are on the same color scale
-shadeLimit <- 125
+shade_limit <- 125
 
 # Create hover text
 sb_locs_state$hover <- with(
@@ -260,7 +252,6 @@ sb_locs_state$hover <- with(
     "Population: ", population
   )
 )
-
 # Create the map
 map1 <- plot_geo(sb_locs_state, locationmode = "USA-states") |>
   add_trace(
@@ -271,12 +262,19 @@ map1 <- plot_geo(sb_locs_state, locationmode = "USA-states") |>
     colors = "Reds"
   ) |>
   layout(title = "Starbucks Stores by State", geo = set_map_details)
-map1
 
 
-map2 <- plot_geo()
-map2
+map2 <- plot_geo(sb_locs_state, locationmode = "USA-states") |>
+  add_trace(
+    z = ~population,
+    text = ~hover,
+    locations = ~state_abbr,
+    color = ~population,
+    colors = "Greens"
+  ) |>
+  layout(title = "Population by State", geo = set_map_details)
 
 subplot(map1, map2)
 ```
 
+We note that there is some association between the number of Starbucks stores and population. For example, California has the most population, and it indeed has the most Starbucks stores. Texas, Washington, New York and Florida have relatively high population and they also have more Starbucks stores than other states.
